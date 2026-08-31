@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>智能客服助手</title>
+    <style>
+        /* 随便加点简单的样式让界面好看点 */
+        body { font-family: Arial, sans-serif; background: #f0f2f5; display: flex; justify-content: center; padding-top: 50px; }
+        .container { width: 500px; background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 20px; }
+        #chat-box { height: 400px; overflow-y: scroll; border-bottom: 1px solid #ddd; margin-bottom: 15px; padding: 10px; }
+        .msg { margin-bottom: 15px; }
+        .user-msg { text-align: right; color: blue; }
+        .bot-msg { text-align: left; color: green; }
+        .intent-tag { font-size: 12px; background: #eee; padding: 2px 8px; border-radius: 10px; margin-left: 5px; }
+        input { width: 80%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        button { width: 15%; padding: 10px; background: #0066cc; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🤖 售后智能客服</h2>
+        <div id="chat-box">
+            <!-- 这里会动态显示聊天气泡 -->
+            <div class="msg bot-msg">👋 你好！我是智能客服，请问你需要退货、换货还是查物流呢？</div>
+        </div>
+        <div>
+            <input type="text" id="user-input" placeholder="输入你的问题..." />
+            <button onclick="sendMessage()">发送</button>
+        </div>
+    </div>
+
+    <script>
+        // 这是前端的大脑逻辑
+        function sendMessage() {
+            var input = document.getElementById('user-input');
+            var message = input.value.trim();
+            if (message === '') return;
+            
+            var chatBox = document.getElementById('chat-box');
+            
+            // 1. 把你刚才打的话显示在聊天框里（右侧）
+            chatBox.innerHTML += `<div class="msg user-msg">🧑 ${message}</div>`;
+            input.value = '';
+            chatBox.scrollTop = chatBox.scrollHeight; // 滚动到底部
+            
+            // 2. 把这个消息发给后端的 /chat 接口（也就是 app.py 里的函数）
+            fetch('/chat', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({message: message})
+            })
+            .then(response => response.json()) // 把后端返回的数据转成对象
+            .then(data => {
+                // 3. 把后端（AI）返回的回复显示在聊天框里（左侧）
+                // 顺便把AI判断出来的意图（退货/换货/物流）也用小标签显示出来
+                chatBox.innerHTML += `<div class="msg bot-msg">🤖 ${data.reply} <span class="intent-tag">${data.intent}</span></div>`;
+                chatBox.scrollTop = chatBox.scrollHeight;
+            });
+        }
+        // 按回车键也能发送
+        document.getElementById('user-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') sendMessage();
+        });
+    </script>
+</body>
+</html>
