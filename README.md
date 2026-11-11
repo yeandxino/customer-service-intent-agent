@@ -56,8 +56,8 @@ System Prompt 里给出**完整的 JSON 模板 + 一个示例**，并明确要�
 ## 快速开始
 
 ```bash
-git clone https://github.com/yeandxino/my_agent.git
-cd my_agent
+git clone https://github.com/yeandxino/customer-service-intent-agent.git
+cd customer-service-intent-agent
 
 pip install -r requirements.txt
 
