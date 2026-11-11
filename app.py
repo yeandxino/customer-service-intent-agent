@@ -1,7 +1,10 @@
 from flask import Flask, request, jsonify, render_template
 import requests
 import json
-import os   # 新增：用来读取环境变量
+import os
+from dotenv import load_dotenv
+
+load_dotenv()  # 载入同目录 .env
 
 app = Flask(__name__)
 
@@ -79,7 +82,7 @@ def chat():
         data = json.loads(ai_response)
         intent = data.get("intent", "其他")
         reply = data.get("reply", "我没理解您的意思，请再说一遍。")
-    except:
+    except (json.JSONDecodeError, KeyError, TypeError):
         # 如果解析失败（AI没按格式返回），用默认回复
         intent = "其他"
         reply = "抱歉，我暂时无法回答您的问题。"
